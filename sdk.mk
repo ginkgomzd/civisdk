@@ -47,8 +47,8 @@ shell: install
 build deploy:
 	@$(run-service) shell make -C app
 
-.env: DONT_CARE := $(or $(CONFIG_INCLUDES),$(error Make-Do include unavailable. Try running in the shell container))
-.env: conf/env-mysql.conf conf/build-args.conf | set-env-host
+.env: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the shell container))
+.env: conf/env-mysql.conf conf/build-args.conf | set-env-host set-env-uid-gid
 	$(eval THEVARS := $(shell cat $^ | $(parse-conf-vars.awk)))
 	$(eval export ${THEVARS})
 	@truncate -s 0 $@
@@ -59,9 +59,17 @@ build deploy:
 # # #
 # provide host IP to docker-compose environment
 # primarilty for XDEBUG_CONFIG
+set-env-host: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the shell container))
 set-env-host: HOST_IP=$(shell /sbin/ip route | awk '/default/ { print $$3 }')
 set-env-host:
-	$(MAKE) conf/build-args.conf-save
+	@$(MAKE) -s conf/build-args.conf-save
+.PHONY: set-env-host
+
+set-env-uid-gid: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the shell container))
+set-env-uid-gid: LOGIN_UID=$(shell id -u)
+set-env-uid-gid: LOGIN_GID=$(shell id -g)
+set-env-uid-gid:
+	@$(MAKE) -s conf/build-args.conf-save
 .PHONY: set-env-host
 
 up: .env

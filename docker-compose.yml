@@ -19,8 +19,8 @@ services:
     build: 
       context: docker/sdk
       args:
-        # LOGIN_UID: ${LOGIN_ID}
-        # LOGIN_GID: ${LOGIN_GID}
+        LOGIN_UID: ${LOGIN_UID}
+        LOGIN_GID: ${LOGIN_GID}
         FROM_IMAGE: civisdk/php
     volumes:
       - ./volumes/home:/home/cividev
