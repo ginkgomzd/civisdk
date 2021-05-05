@@ -1,0 +1,56 @@
+{
+  "name": "civicrm/sdk",
+  "description": "Manage Composer dependencies for docker-compose-based SDK for CiviCRM. Forked/sloughed-off civicrm/buildkit",
+  "homepage": "https://github.com/ginkgomzd/civicrm_sdk",
+  "license": "GPL-2.0+",
+  "authors": [
+    { "name": "Michael Z. Daryabeygi", "email": "ginkgomzd@fastmail.com" }
+  ],
+  "autoload": {
+    "psr-0": {
+      "Civi\\Civibuild": ["src/"]
+    }
+  },
+  "config": {
+    "platform": {
+      "php": "5.6"
+    },
+    "bin-dir": "bin"
+  },
+  "require": {
+    "php": ">=5.6",
+    "totten/php-symbol-diff": "dev-master#54f869ca68a3cd75f3386f8490870369733d2c23",
+    "civicrm/upgrade-test": "dev-master#03e554787f378900f870a030cf2575d3cd49900f",
+    "drupal/coder": "dev-8.x-2.x-civi#b04829b2095b6351531050f3ad25448fe63f1ce9",
+    "civicrm/composer-downloads-plugin": "^3.0",
+    "squizlabs/php_codesniffer": ">=2.7 <4.0"
+  },
+  "repositories": [
+    {
+      "type": "git",
+      "url": "https://github.com/civicrm/coder.git"
+    },
+    {
+      "type": "git",
+      "url": "https://github.com/totten/paratest.git"
+    }
+  ],
+  "extra": {
+    "downloads": {
+      "box": {"version": "2.7.5", "url": "https://github.com/box-project/box2/releases/download/{$version}/box-{$version}.phar", "path": "bin/box", "type": "phar"},
+      "civici": {"version": "2020-07-10-6a29419c", "url": "https://download.civicrm.org/civici/civici.phar-{$version}", "path": "bin/civici", "type": "phar"},
+      "civistrings": {"version": "2020-10-22-9e260990", "url": "https://download.civicrm.org/civistrings/civistrings.phar-{$version}", "path": "bin/civistrings", "type": "phar"},
+      "civix": {"version": "v21.04.1", "url": "https://download.civicrm.org/civix/civix.phar-{$version}", "path": "bin/civix", "type": "phar"},
+      "cv": {"version": "2021-01-26-e9cedec8", "url": "https://download.civicrm.org/cv/cv.phar-{$version}", "path": "bin/cv", "type": "phar"},
+      "drush8": {"version": "8.4.0", "url": "https://github.com/drush-ops/drush/releases/download/{$version}/drush.phar", "path": "bin/drush", "type": "phar"},
+      "drush-backdrop": {"version": "1.0.0", "url": "https://github.com/backdrop-contrib/drush/archive/{$version}.zip", "path": ".drush/commands/backdrop"},
+      "git-scan": {"version": "2020-07-16-5f15f6f5", "url": "https://download.civicrm.org/git-scan/git-scan.phar-{$version}", "path": "bin/git-scan", "type": "phar"},
+      "phpunit4": {"version": "4.8.21", "url": "https://phar.phpunit.de/phpunit-{$version}.phar", "path": "bin/phpunit4", "type": "phar"},
+      "phpunit5": {"version": "5.x", "url": "https://phar.phpunit.de/phpunit-5.phar", "path": "bin/phpunit5", "type": "phar"},
+      "phpunit6": {"version": "6.x", "url": "https://phar.phpunit.de/phpunit-6.phar", "path": "bin/phpunit6", "type": "phar"},
+      "phpunit7": {"version": "7.5.15", "url": "https://phar.phpunit.de/phpunit-7.5.15.phar", "path": "bin/phpunit7", "type": "phar"},
+      "pogo": {"version": "0.2.4", "url": "https://github.com/totten/pogo/releases/download/v{$version}/pogo-{$version}.phar", "path": "bin/pogo", "type": "phar"},
+      "wp": {"version": "2.4.0", "url": "https://github.com/wp-cli/wp-cli/releases/download/v{$version}/wp-cli-{$version}.phar", "path": "bin/wp", "type": "phar"}
+    }
+  }
+}

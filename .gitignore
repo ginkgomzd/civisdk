@@ -1,0 +1,13 @@
+/.env
+/conf/env-mysql.conf
+/.vscode
+/app
+node_modules/
+.npm/
+.composer/
+vendor/
+/volumes/home/bin
+/volumes/home/app
+/volumes/home/conf
+/volumes/home/.*
+/volumes/home/logs
