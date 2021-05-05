@@ -33,6 +33,9 @@ SDK CONTAINERS CLI
 	`build` 	- runs the default make in app/ inside a "shell" container
 	`tail`		- docker-compose logs -f; use the source for "logs" service for Civi/CMS logs.
 	`list` 		- to see running containers
+
+INSTALL:
+	`configure` - interactive setup to generate the .env [WIP - see TODO:]
 	`.env` 		- updated from certain conf/ files (use the source)
 
 See Makefile for other features.
@@ -71,6 +74,15 @@ set-env-uid-gid: LOGIN_GID=$(shell id -g)
 set-env-uid-gid:
 	@$(MAKE) -s conf/build-args.conf-save
 .PHONY: set-env-host
+
+#
+# TODO: some kind of buffering is hobbling interactive config.
+# does not work even not as a sub-sub-shell (make > dk-cmp run > make > sh -c awk...)
+# so, maybe an awk problem? https://www.gnu.org/software/gawk/manual/html_node/I_002fO-Functions.html
+#
+configure: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the shell container))
+configure:
+	${run-service} make-do reconfigure .env
 
 up: .env
 	docker-compose up -d

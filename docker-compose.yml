@@ -75,6 +75,18 @@ services:
     links:
       - mysql57
 
+  make-do:
+    image: civisdk/make-do-runner
+    build: 
+      context: docker/make-do
+      args:
+        LOGIN_UID: ${LOGIN_UID}
+    # command: ["make", "reconfigure"]
+    working_dir: /tmp/build
+    volumes:
+      - ./:/tmp/build
+    profiles: ["util"]
+
 # # #
 # DB Servers
 #
