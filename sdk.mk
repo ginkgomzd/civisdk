@@ -7,12 +7,19 @@
 
 run-service = docker-compose run --rm
 
+#
+# YAGNI, but I can't help maself
+#
 ifdef NAMESPACE
 	# run an images not in the docker-compose.yml:
 	run-image = docker run --rm --network ${NAMESPACE}_default
 endif
 
-# -include mdo-config.mk
+#
+# only required when working with config files:
+# see validation in .env recipe for how to safely use
+# will be available in the configure-sdk dk-cmp service
+-include mdo-config.mk
 
 define HELP_TXT
 
