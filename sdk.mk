@@ -32,10 +32,11 @@ SDK CONTAINERS CLI
 	`shell` 	- for a shell with SDK dev tools installed
 	`build` 	- runs the default make in app/ inside a "shell" container
 	`tail`		- docker-compose logs -f; use the source for "logs" service for Civi/CMS logs.
-	`list` 		- to see running containers
+	`list` 		- available services
 
 INSTALL:
 	`configure` - interactive setup to generate the .env [WIP - see TODO:]
+	`install`	- initialize the home volume and install the SDK libraries
 	`.env` 		- updated from certain conf/ files (use the source)
 
 See Makefile for other features.
@@ -91,6 +92,9 @@ down:
 	docker-compose down
 
 install: volumes/home/bin
+
+list:
+	docker-compose config --services
 
 # using as proxy flag for sdk installation
 volumes/home/bin:
