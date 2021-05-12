@@ -34,6 +34,16 @@ bin/composer: bin
 	$(MAKE) -f composer.mk INSTALL_PATH='./bin'
 	touch $@
 
+define BASHRC_PATH :=
+
+PATH="/home/$$(whoami)/bin:$${PATH}"
+
+endef
+
+.bashrc: export BASHRC_PATH
+.bashrc:
+	echo "$$BASHRC_PROFILE" > $@
+
 .drush/commands:
 	mkdir -p $@
 
@@ -41,7 +51,7 @@ package.json:
 	curl -L -o $@ \
 	https://raw.githubusercontent.com/civicrm/civicrm-buildkit/master/package.json
 
-install-sdk: package.json bin/composer composer.json .drush/commands bin/joomla
+install-sdk: package.json bin/composer composer.json .bashrc .drush/commands bin/joomla
 	composer install # --no-cache
 	-composer validate
 	-drush init -y && drush cc drush
@@ -79,6 +89,6 @@ endef
 clean:
 	rm -rf  bin vendor node_modules 
 	rm -rf .drush/commands/backdrop .joomla-cli bin/joomla \
-	.drush .composer .npm .config
+	.drush .composer .npm .config .bashrc
 	$(foreach pkg, ${NODE_BINS}, $(call unlink,bin/$(notdir ${pkg})))
 	$(foreach pkg, ${PHAR_BINS}, $(call rm,bin/$(notdir ${pkg})))
