@@ -34,15 +34,19 @@ bin/composer: bin
 	$(MAKE) -f composer.mk INSTALL_PATH='./bin'
 	touch $@
 
-define BASHRC_PATH :=
+define BASHRC :=
 
 PATH="/home/$$(whoami)/bin:$${PATH}"
 
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
 endef
 
-.bashrc: export BASHRC_PATH
+.bashrc: export BASHRC
 .bashrc:
-	echo "$$BASHRC_PROFILE" > $@
+	echo "$$BASHRC" > $@
 
 define BASH_PROFILE :=
 
@@ -56,6 +60,35 @@ endef
 .profile: export BASH_PROFILE
 .profile:
 	echo "$$BASH_PROFILE" >> $@
+
+define BASH_ALIASES :=
+
+# enable color support
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+
+    export COLOR_AUTO=' --color=auto'
+fi
+
+alias ls='ls --color=auto'
+alias ll='ls -hal'
+
+###
+# Include local customizations
+if [ -d ~/.bash_aliases_local ]; then
+	for f in ~/.bash_aliases_local/*
+	do
+		if [ -f "$f" ]; then
+			. "$f"
+		fi
+	done
+fi
+
+endef
+
+.bash_aliases: export BASH_ALIASES
+.bash_aliases:
+	echo "$$BASH_ALIASES" >> $@
 
 .drush/commands:
 	mkdir -p $@
