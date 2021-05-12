@@ -44,6 +44,19 @@ endef
 .bashrc:
 	echo "$$BASHRC_PROFILE" > $@
 
+define BASH_PROFILE :=
+
+# include .bashrc if it exists
+if [ -f "$$HOME/.bashrc" ]; then
+    . "$$HOME/.bashrc"
+fi
+
+endef
+
+.profile: export BASH_PROFILE
+.profile:
+	echo "$$BASH_PROFILE" >> $@
+
 .drush/commands:
 	mkdir -p $@
 
@@ -51,7 +64,7 @@ package.json:
 	curl -L -o $@ \
 	https://raw.githubusercontent.com/civicrm/civicrm-buildkit/master/package.json
 
-install-sdk: package.json bin/composer composer.json .bashrc .drush/commands bin/joomla
+install-sdk: package.json bin/composer composer.json .bashrc .profile .drush/commands bin/joomla
 	composer install # --no-cache
 	-composer validate
 	-drush init -y && drush cc drush
@@ -89,6 +102,6 @@ endef
 clean:
 	rm -rf  bin vendor node_modules 
 	rm -rf .drush/commands/backdrop .joomla-cli bin/joomla \
-	.drush .composer .npm .config .bashrc
+	.drush .composer .npm .config .bashrc .profile
 	$(foreach pkg, ${NODE_BINS}, $(call unlink,bin/$(notdir ${pkg})))
 	$(foreach pkg, ${PHAR_BINS}, $(call rm,bin/$(notdir ${pkg})))
