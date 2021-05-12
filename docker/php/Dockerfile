@@ -46,12 +46,22 @@ RUN docker-php-ext-install bcmath \
   && docker-php-ext-install zip
 # used?? installed in buildkit...
 # && docker-php-ext-install ldap \
-  
+
+COPY etc_apache2_ports.conf /etc/apache2/ports.conf
+COPY etc_apache2_sites-available_000-default.conf /etc/apache2/sites-available/000-default.conf
+
 # Install and enable imagick PECL extensions
 RUN pecl install imagick \
   && docker-php-ext-enable imagick
 # Install xdebug PECL extension
 RUN pecl install xdebug \
   && docker-php-ext-enable xdebug
+
+ARG LOGIN_UID=33
+ARG LOGIN_GID=${LOGIN_UID}
+ARG USER_NAME=docker-user
+
+RUN addgroup --gid=$LOGIN_GID $USER_NAME
+RUN useradd --create-home --uid ${LOGIN_UID} --gid ${LOGIN_GID} ${USER_NAME}
 
 RUN a2enmod rewrite headers
