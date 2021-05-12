@@ -20,6 +20,7 @@ RUN apt-get install -y --no-install-recommends \
   nano \
   nodejs \
   rsync \
+  sudo \
   unzip \
   vim \
   zip \
