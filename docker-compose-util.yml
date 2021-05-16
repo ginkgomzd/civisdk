@@ -1,0 +1,66 @@
+version: "3"
+
+volumes:
+  htdocs:
+
+services:
+
+  shell:
+    image: civisdk/shell
+    build: 
+      context: docker/sdk
+      args:
+        LOGIN_UID: ${LOGIN_UID}
+        LOGIN_GID: ${LOGIN_GID}
+        FROM_IMAGE: civisdk/php
+    volumes:
+      - ./volumes/home:/home/cividev
+      - htdocs:/var/www/html
+      - ./app:/home/cividev/app
+      - ./conf:/home/cividev/conf
+    profiles: [ util ] # disable auto-start
+  
+  mysql-root:
+    image: mysql:5.7
+    command:
+      - "/usr/bin/mysql"
+      - "-h${MYSQL_HOST}"
+      - "-uroot"
+      - "-p${MYSQL_ROOT_PASSWORD}"
+    profiles: [ util ]
+
+  mysql-cli: 
+    image: mysql:5.7
+    command: 
+      - "/usr/bin/mysql"
+      - "-h${MYSQL_HOST}"
+      - "-u${MYSQL_USER}"
+      - "-p${MYSQL_PASSWORD}"
+    profiles: [ util ]
+
+  mysql8-cli: 
+    image: mysql:8
+    command: 
+      - "/usr/bin/mysql"
+      - "-hmysql8"
+      - "-u${MYSQL_USER}"
+      - "-p${MYSQL_PASSWORD}"
+    environment:
+      - MYSQL_HOST
+      - MYSQL_DATABASE
+      - MYSQL_USER
+      - MYSQL_PASSWORD
+    profiles: [ util ]
+
+  make-do:
+    image: civisdk/make-do-runner
+    build: 
+      context: docker/make-do
+      args:
+        LOGIN_UID: ${LOGIN_UID}
+    # command: ["make", "reconfigure"]
+    working_dir: /tmp/build
+    volumes:
+      - ./:/tmp/build
+    profiles: [ util ]
+

@@ -6,6 +6,7 @@
 #
 
 run-service = docker-compose run --rm
+run-util = docker-compose -f docker-compose-util.yml run --rm
 
 #
 # YAGNI, but I can't help maself
@@ -30,6 +31,7 @@ SDK CONTAINERS CLI
 	`up` 		- to start SDK container services
 	`down` 		- to stop all SDK container services
 	`shell` 	- for a shell with SDK dev tools installed
+	`mysql-root`- invoke mysql-cli with root credentials to MYSQL_HOST container
 	`build` 	- runs the default make in app/ inside a "shell" container
 	`tail`		- docker-compose logs -f; use the source for "logs" service for Civi/CMS logs.
 	`list` 		- available services
@@ -46,10 +48,13 @@ default help:
 	$(info $(HELP_TXT))
 
 shell: install
-	${run-service} shell
+	${run-util} shell
+
+mysql-root:
+	${run-util} mysql-root
 
 build deploy:
-	@$(run-service) shell make -C app
+	@$(run-util) shell make -C app
 
 .env: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container))
 .env: conf/env-mysql.conf conf/build-args.conf | set-env-host set-env-uid-gid
@@ -83,7 +88,7 @@ set-env-uid-gid:
 #
 configure: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container))
 configure:
-	${run-service} make-do reconfigure .env
+	${run-util} make-do reconfigure .env
 
 up: .env
 	docker-compose up -d
@@ -98,10 +103,10 @@ list:
 
 # using as proxy flag for sdk installation
 volumes/home/bin:
-	@$(run-service) shell make -f install-sdk.mk clean install
+	@$(run-util) shell make -f install-sdk.mk clean install
 
 re-install:
-	@$(run-service) shell make -f install-sdk.mk clean install
+	@$(run-util) shell make -f install-sdk.mk clean install
 
 # # #
 # MySQL User and Permissions
@@ -128,7 +133,7 @@ endef
 create-db-user: $(eval export create_db_user)
 create-db-user: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container.))
 create-db-user:
-	@echo "$$create_db_user" | $(run-service) mysql-root
+	@echo "$$create_db_user" | $(run-util) mysql-root
 
 define set_db_password
 ALTER USER ${MYSQL_USER}@`%` IDENTIFIED BY '${MYSQL_PASSWORD}'
@@ -137,7 +142,7 @@ endef
 set-db-password: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container.))
 set-db-password: $(eval export set_db_password)
 set-db-password:
-	@echo "$$set_db_password" | $(run-service) mysql-root
+	@echo "$$set_db_password" | $(run-util) mysql-root
 
 define set_db_grants
 GRANT ALL PRIVILEGES ON `${MYSQL_USER}_%`.* to ${MYSQL_USER}@`%`;
@@ -147,7 +152,7 @@ endef
 set-db-grants: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container.))
 set-db-grants: $(eval export set_db_grants)
 set-db-grants:
-	@echo "$$set_db_grants" | $(run-service) mysql-root
+	@echo "$$set_db_grants" | $(run-util) mysql-root
 
 test-mysql-conn:
-	$(run-service) mysql-cli
+	$(run-util) mysql-cli
