@@ -11,8 +11,9 @@ ARG USER_NAME=cividev
 # NB: less is required by wp-cli
 # leaving-out sudo because: why are you doing sysadmin inside a container?
 
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash - && apt-get update
-RUN apt-get install -y --no-install-recommends \
+RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+  && apt-get install -y --no-install-recommends \
   bash-completion \
   default-mysql-client \
   git \

@@ -16,7 +16,7 @@ FROM php:${PHP_VERSION}-apache
 # * iproute2 (required to get host ip from container)
 # * msmtp-mta (for routing mail to maildev)
 
-RUN apt-get update \
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
   && apt-get install -y --no-install-recommends \
   iproute2 \
   libc-client-dev \
