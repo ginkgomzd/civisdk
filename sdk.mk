@@ -51,7 +51,7 @@ shell: install
 build deploy:
 	@$(run-service) shell make -C app
 
-.env: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the shell container))
+.env: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container))
 .env: conf/env-mysql.conf conf/build-args.conf | set-env-host set-env-uid-gid
 	$(eval THEVARS := $(shell cat $^ | $(parse-conf-vars.awk)))
 	$(eval export ${THEVARS})
@@ -63,13 +63,13 @@ build deploy:
 # # #
 # provide host IP to docker-compose environment
 # primarilty for XDEBUG_CONFIG
-set-env-host: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the shell container))
+set-env-host: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container))
 set-env-host: HOST_IP=$(shell /sbin/ip route | awk '/default/ { print $$3 }')
 set-env-host:
 	@$(MAKE) -s conf/build-args.conf-save
 .PHONY: set-env-host
 
-set-env-uid-gid: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the shell container))
+set-env-uid-gid: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container))
 set-env-uid-gid: LOGIN_UID=$(shell id -u)
 set-env-uid-gid: LOGIN_GID=$(shell id -g)
 set-env-uid-gid:
@@ -81,7 +81,7 @@ set-env-uid-gid:
 # does not work even not as a sub-sub-shell (make > dk-cmp run > make > sh -c awk...)
 # so, maybe an awk problem? https://www.gnu.org/software/gawk/manual/html_node/I_002fO-Functions.html
 #
-configure: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the shell container))
+configure: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container))
 configure:
 	${run-service} make-do reconfigure .env
 
@@ -102,3 +102,52 @@ volumes/home/bin:
 
 re-install:
 	@$(run-service) shell make -f install-sdk.mk clean install
+
+# # #
+# MySQL User and Permissions
+# # #
+
+define my_cnf_tpl
+[client]
+user={{USER}}
+password={{PASSWORD}}
+
+endef
+
+conf/my.cnf: $(eval export USER = ${MYSQL_USER})
+conf/my.cnf: $(eval export PASSWORD = ${MYSQL_PASSWORD})
+conf/my.cnf: $(eval export my_cnf_tpl)
+conf/my.cnf: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container.))
+conf/my.cnf:
+	echo "$${my_cnf_tpl}" | $(REPLACE_TOKENS) > $@
+
+define create_db_user
+CREATE USER ${MYSQL_USER}@`%`
+endef
+
+create-db-user: $(eval export create_db_user)
+create-db-user: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container.))
+create-db-user:
+	@echo "$$create_db_user" | $(run-service) mysql-root
+
+define set_db_password
+ALTER USER ${MYSQL_USER}@`%` IDENTIFIED BY '${MYSQL_PASSWORD}'
+endef
+
+set-db-password: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container.))
+set-db-password: $(eval export set_db_password)
+set-db-password:
+	@echo "$$set_db_password" | $(run-service) mysql-root
+
+define set_db_grants
+GRANT ALL PRIVILEGES ON `${MYSQL_USER}_%`.* to ${MYSQL_USER}@`%`;
+GRANT ALL PRIVILEGES ON `${MYSQL_USER}`.* to ${MYSQL_USER}@`%`;
+endef
+
+set-db-grants: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container.))
+set-db-grants: $(eval export set_db_grants)
+set-db-grants:
+	@echo "$$set_db_grants" | $(run-service) mysql-root
+
+test-mysql-conn:
+	$(run-service) mysql-cli
