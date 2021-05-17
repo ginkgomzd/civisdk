@@ -34,33 +34,6 @@ bin/composer: bin
 	$(MAKE) -f composer.mk INSTALL_PATH='./bin'
 	touch $@
 
-define BASHRC :=
-
-PATH="/home/$$(whoami)/bin:$${PATH}"
-
-if [ -f ~/.bash_aliases ]; then
-    . ~/.bash_aliases
-fi
-
-endef
-
-.bashrc: export BASHRC
-.bashrc:
-	echo "$$BASHRC" > $@
-
-define BASH_PROFILE :=
-
-# include .bashrc if it exists
-if [ -f "$$HOME/.bashrc" ]; then
-    . "$$HOME/.bashrc"
-fi
-
-endef
-
-.profile: export BASH_PROFILE
-.profile:
-	echo "$$BASH_PROFILE" >> $@
-
 define BASH_ALIASES :=
 
 # enable color support
@@ -86,9 +59,36 @@ fi
 
 endef
 
-.bash_aliases: export BASH_ALIASES
+.bash_aliases: $(eval export BASH_ALIASES)
 .bash_aliases:
 	echo "$$BASH_ALIASES" >> $@
+
+define BASHRC :=
+
+PATH="/home/$$(whoami)/bin:$${PATH}"
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+endef
+
+.bashrc: $(eval export BASHRC)
+.bashrc: .bash_aliases
+	echo "$$BASHRC" > $@
+
+define BASH_PROFILE :=
+
+# include .bashrc if it exists
+if [ -f "$$HOME/.bashrc" ]; then
+    . "$$HOME/.bashrc"
+fi
+
+endef
+
+.profile: $(eval export BASH_PROFILE)
+.profile:
+	echo "$$BASH_PROFILE" >> $@
 
 .drush/commands:
 	mkdir -p $@
