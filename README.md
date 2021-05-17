@@ -1,20 +1,29 @@
 # CiviSDK
 docker-composition for a CiviCRM development environment with recommended tools
 
-### Install
+### Install and Set-up
 
-Depends on ginkgomzd/make-do for `make` includes, chiefly to manage configurations.
+Optionally, for an interactive prompt for configurations, and to dynamically generate a docker-compose `.env` file: install ginkgomzd/make-do. It requires gnu make and gnu awk. Coming soon: a container to complete configuration.
+
+To manually configure: review each .tpl file in `conf/` and create a `.env` file with the same config variables. See the docker-compose documentation on using `.env` files.
+
+Either copy or create a symlink of the `default.docker-compose.yml` so that you have a `docker-compose.yml`. Using a symlink can be convenient if you want to quickly switch between a custom, the default, or the util docker-compose configuration.
 
 The first time you run the shell container, or by calling `make install` explicitly, install-sdk.mk is run to fetch the SDK libraries. This could take some time, and the files will be downloaded to `volumes/home/`.
 
-## Use the Source, Luke
-
-`Makefile` in the repo root is a good starting place. Next stop should be `docker-compose.yml`.
 
 ## Orientation
 
+The "SDK" itself is essentially a docker-compose container-constellation, and a single container to run a shell in that bind-mounts the `volumes/home` directory to the shell-user's home directory. After the SDK install, recommended CiviCRM development tools are fetched and linked within the home bind-mount. The `app/` directory is also bind-mounted in the shell-user's home directory.
+
+This repo defines docker-compose services in default.docker-compose.yml and util.docker-compose.yml. Scripts are written in Gnu Make, and you can search for `Makefile` or files with the extension, `.mk`. Configure docker-
+
+The `Makefile` in the root is for you to write your own utils, and includes some helpers in `sdk.mk`. Run `make` with no other parameters to display the help and list available commands.
+
 Create your app in `/app`. If you build your app with a Makefile, then just clone your repo and run `make build` (in this dir).
 It will run `make` in the sdk shell container.
+
+**Use the source, Luke.**
 
 ### Containers
 
