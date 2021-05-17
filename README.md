@@ -45,7 +45,27 @@ The first time you run one of the SDK make targets, you will be prompted to inte
 
 For interactive config support, add new configs to the corresponding `.tpl`. You can add help-text as a comment (shell-comment style) at the end of the line. Try `make add-config` to interactively extend the config-file template (`.tpl`).
 
-## Debugging
+## Makefiles
+
+If you are unfamiliar with Gnu Make, you can get up and running pretty quickly if you are familiar with shell scripting. The make-files in this repo will provide some examples to follow.
+
+NOTE: in ubuntu containers (like these), the default shell is not Bash, i.e., don't depend on Bashisms. https://wiki.ubuntu.com/DashAsBinSh
+
+The major trick of Make is that it optimizes builds by only creating files that are missing or deemed out of date. The other great trick of Make is that global scope pollution is avoided by running each line of a "recipe" in a new sub-shell. The thrid great trick of Make is that shell commands can be dynamically generated with at least one-pass of the make parser, or with additional evaluation using user-functions (`$(call my-func,${PARAM_1...})`) or `$(eval ...)`.
+
+Files are known as "Targets" in Make and a target has three parts:
+
+ * the identifier, which can have one or more names, and use pattern-matching
+ * pre-requisites: which must exist or will trigger the target to be re-made if the pre-requisite is newer.
+ * recipe: one or more sub-shell commands to run to make the target
+
+### Building your App
+
+The point is that you can do whatever you need to do to build your app. This SDK just provides a container to run your build in.
+
+The `sdk.mk` defines a helper called "build" that will execute `make -C /home/cividev/app` inside the container; i.e. it changes to the bind-mounted app directory and runs the default make target. If you are using other tools to build your app, you can create your own build target in the custom `Makefile`, or create a simple `app/Makefile` that calls your build routine.
+
+### Debugging
 
 The php image is configured with xdebug.
 
