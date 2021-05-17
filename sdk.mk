@@ -35,6 +35,7 @@ SDK CONTAINERS CLI
 	`build` 	- runs the default make in app/ inside a "shell" container
 	`tail`		- docker-compose logs -f; use the source for "logs" service for Civi/CMS logs.
 	`list` 		- available services
+	`utils`		- available utility containers from docker-compose-util.yml
 
 INSTALL:
 	`configure` - interactive setup to generate the .env [WIP - see TODO:]
@@ -100,6 +101,9 @@ install: volumes/home/bin
 
 list:
 	docker-compose config --services
+
+utils:
+	docker-compose -f docker-compose-util.yml config --services
 
 # using as proxy flag for sdk installation
 volumes/home/bin:
