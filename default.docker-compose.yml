@@ -33,6 +33,28 @@ services:
     links:
       - mysql57
 
+  builder:
+    image: civisdk/make-do-runner
+    working_dir: /home/cividev
+    volumes:
+      - ./volumes/home:/home/cividev
+      - htdocs:/var/www/html
+      - ./app:/home/cividev/app
+      - ./conf:/home/cividev/conf
+    profiles: ["util"] # disable auto-start
+    links: [ mysql57 ]
+
+  logs:
+    image: civisdk/shell
+    working_dir: /home/cividev/logs
+    command: ["make"]
+    volumes:
+      - htdocs:/var/www/html
+      - ./volumes/home:/home/cividev
+      - ./app:/home/cividev/app
+      - ./conf:/home/cividev/conf
+      - ./volumes/logs:/home/cividev/logs
+
 # # #
 # DB Servers
 #

@@ -11,3 +11,5 @@ vendor/
 /volumes/home/conf
 /volumes/home/.*
 /volumes/home/logs
+docker-compose.yml
+
