@@ -42,6 +42,14 @@ INSTALL:
 	`install`	- initialize the home volume and install the SDK libraries
 	`.env` 		- updated from certain conf/ files (use the source)
 
+MULTIPLE DOCKER-COMPOSE FILES:
+
+Manage the default docker-compose.yml as a symbolic link for quick switching.
+
+	`ln-distro`	- create symbolic link to default.docker-compose.yml
+	`ln-dev`	- create symbolic link to your custom dev.docker-compose.yml
+	`ln-util`	- create symbolic link to sdk utility containers in util.docker-compose.yml
+
 See Makefile for other features.
 endef
 
@@ -160,3 +168,36 @@ set-db-grants:
 
 test-mysql-conn:
 	$(run-util) mysql-cli
+
+# # #
+# Manage multipe docker-compose files by 
+# linking different versions to the default docker-compose file name.
+# # #
+
+define safe-unlink-compose-file
+	@# File is not a link, so back-up
+	@#$(or $(shell test -L docker-compose.yml && echo 'TRUE'), $(call backup-compose-file))
+	@# File does not exist, or try to remove
+	@#$(or $(shell test ! -e docker-compose.yml && echo 'TRUE'), $(shell rm -f docker-compose.yml))
+endef
+
+define backup-compose-file
+	@# Abort if back-up location already exists
+	@#$(and $(shell test -f dev.docker-compose.yml && echo 'ERROR'), \
+		$(error Can not back-up docker-compose.yml, aborting))
+	@# Back-up, unless the file does not exist
+	@#$(or $(shell test ! -e docker-compose.yml && echo 'TRUE'), \
+		$(shell mv docker-compose.yml dev.docker-compose.yml && echo 'Backed-up to dev.docker-compose.yml'))
+endef
+
+ln-dev:
+	$(safe-unlink-compose-file)
+	ln -s dev.docker-compose.yml docker-compose.yml
+
+ln-distro:
+	$(safe-unlink-compose-file)
+	ln -s default.docker-compose.yml docker-compose.yml
+
+ln-util:
+	$(safe-unlink-compose-file)
+	ln -s util.docker-compose.yml docker-compose.yml
