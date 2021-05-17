@@ -6,7 +6,7 @@
 #
 
 run-service = docker-compose run --rm
-run-util = docker-compose -f docker-compose-util.yml run --rm
+run-util = docker-compose -f util.docker-compose.yml run --rm
 
 #
 # YAGNI, but I can't help maself
@@ -35,7 +35,7 @@ SDK CONTAINERS CLI
 	`build` 	- runs the default make in app/ inside a "shell" container
 	`tail`		- docker-compose logs -f; use the source for "logs" service for Civi/CMS logs.
 	`list` 		- available services
-	`utils`		- available utility containers from docker-compose-util.yml
+	`utils`		- available utility containers from util.docker-compose.yml
 
 INSTALL:
 	`configure` - interactive setup to generate the .env [WIP - see TODO:]
@@ -103,7 +103,7 @@ list:
 	docker-compose config --services
 
 utils:
-	docker-compose -f docker-compose-util.yml config --services
+	docker-compose -f util.docker-compose.yml config --services
 
 # using as proxy flag for sdk installation
 volumes/home/bin:
