@@ -170,7 +170,7 @@ test-mysql-conn:
 	$(run-util) mysql-cli
 
 # # #
-# Manage multipe docker-compose files by 
+# Manage multiple docker-compose files by 
 # linking different versions to the default docker-compose file name.
 # # #
 
@@ -178,7 +178,7 @@ define safe-unlink-compose-file
 	@# File is not a link, so back-up
 	@#$(or $(shell test -L docker-compose.yml && echo 'TRUE'), $(call backup-compose-file))
 	@# File does not exist, or try to remove
-	@#$(or $(shell test ! -e docker-compose.yml && echo 'TRUE'), $(shell rm -f docker-compose.yml))
+	@#$(if $(shell (test -L docker-compose.yml || test -e docker-compose.yml) && echo 'TRUE'), $(shell rm -f docker-compose.yml))
 endef
 
 define backup-compose-file
