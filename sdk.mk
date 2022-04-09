@@ -12,14 +12,14 @@ run-util = docker-compose -f util.docker-compose.yml run --rm
 # YAGNI, but I can't help maself
 #
 ifdef NAMESPACE
-	# run an images not in the docker-compose.yml:
+	# run an image not in the docker-compose.yml:
 	run-image = docker run --rm --network ${NAMESPACE}_default
 endif
 
 #
 # only required when working with config files:
-# see validation in .env recipe for how to safely use
-# will be available in the configure-sdk dk-cmp service
+# see validation in .env recipe for how to safely use.
+# will be available in the configure-sdk docker-compose service.
 -include mdo-config.mk
 
 define HELP_TXT
@@ -76,19 +76,17 @@ build deploy:
 
 # # #
 # provide host IP to docker-compose environment
-# primarilty for XDEBUG_CONFIG
+# primarily for XDEBUG_CONFIG
 set-env-host: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container))
 set-env-host: HOST_IP=$(shell /sbin/ip route | awk '/default/ { print $$3 }')
 set-env-host:
 	@$(MAKE) -s conf/build-args.conf-save
-.PHONY: set-env-host
 
 set-env-uid-gid: VALIDATE := $(or ${CONFIG_INCLUDES},$(error Make-Do include unavailable. Try running in the make-do container))
 set-env-uid-gid: LOGIN_UID=$(shell id -u)
 set-env-uid-gid: LOGIN_GID=$(shell id -g)
 set-env-uid-gid:
 	@$(MAKE) -s conf/build-args.conf-save
-.PHONY: set-env-host
 
 #
 # TODO: some kind of buffering is hobbling interactive config.
