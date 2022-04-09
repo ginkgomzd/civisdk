@@ -28,6 +28,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
   libxml2-dev \
   libzip-dev \
   msmtp-mta \
+  wkhtmltopdf \
   && rm -r /var/lib/apt/lists/*
 
 # Install php extensions (curl, json, mbstring, openssl, posix, phar
